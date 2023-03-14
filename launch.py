@@ -23,6 +23,7 @@ def main():
     group.add_argument('--test', action='store_true')
     group.add_argument('--predict', action='store_true')
 
+    parser.add_argument('--data_dir', default='')
     parser.add_argument('--exp_dir', default='./exp')
     parser.add_argument('--runs_dir', default='./runs')
     parser.add_argument('--verbose', action='store_true', help='if true, set logging level to DEBUG')
@@ -53,6 +54,12 @@ def main():
     config.ckpt_dir = config.get('ckpt_dir') or os.path.join(config.exp_dir, config.trial_name, 'ckpt')
     config.code_dir = config.get('code_dir') or os.path.join(config.exp_dir, config.trial_name, 'code')
     config.config_dir = config.get('config_dir') or os.path.join(config.exp_dir, config.trial_name, 'config')
+
+
+    if args.data_dir:
+        config.dataset.root_dir = args.data_dir or config.dataset.root_dir
+        config.exp_dir = os.path.join(args.data_dir, 'exp')
+        config.runs_dir = os.path.join(args.data_dir, 'runs')
 
     logger = logging.getLogger('pytorch_lightning')
     if args.verbose:

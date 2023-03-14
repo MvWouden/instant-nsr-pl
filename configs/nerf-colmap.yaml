@@ -5,8 +5,8 @@ seed: 42
 dataset:
   name: colmap
   scene: ???
-  root_dir: ./load/unbounded360/${dataset.scene}
-  img_downscale: 4 # specify training image size by either img_wh or img_downscale
+  root_dir: ./load/${dataset.scene}
+  img_downscale: 1 # specify training image size by either img_wh or img_downscale
   estimate_ground: true # if true, use estimated ground plane normal direction as up direction
   use_mask: false # if true, crop out the foreground region; only effective when root_dir/masks folder exists    
   use_pixel_centers: true
@@ -16,13 +16,13 @@ model:
   name: nerf
   radius: 1.0
   num_samples_per_ray: 2048
-  train_num_rays: 128
-  max_train_num_rays: 8192
+  train_num_rays: 256
+  max_train_num_rays: 4096
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 16384
+  ray_chunk: 2048
   learned_background: true
   background_color: random
   geometry:
@@ -33,7 +33,7 @@ model:
     density_bias: -1
     isosurface:
       method: mc
-      resolution: 256
+      resolution: 512
       chunk: 2097152
       threshold: 5.0
     xyz_encoding_config:
@@ -82,13 +82,13 @@ system:
 
 checkpoint:
   save_top_k: -1
-  every_n_train_steps: ${trainer.max_steps}
+  every_n_train_steps: 10000
 
 trainer:
-  max_steps: 20000
-  log_every_n_steps: 200
+  max_steps: 100000
+  log_every_n_steps: 100
   num_sanity_val_steps: 0
-  val_check_interval: 5000
+  val_check_interval: 2500
   limit_train_batches: 1.0
   limit_val_batches: 2
   enable_progress_bar: true 

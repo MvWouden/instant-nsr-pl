@@ -48,18 +48,15 @@ def main():
     config = load_config(args.config, cli_args=extras)
     config.cmd_args = vars(args)
 
+    config.dataset.root_dir = args.data_dir or config.dataset.root_dir
     config.trial_name = config.get('trial_name') or (config.tag + datetime.now().strftime('@%Y%m%d-%H%M%S'))
     config.exp_dir = config.get('exp_dir') or os.path.join(args.exp_dir, config.name)
+    config.exp_dir = os.path.join(args.data_dir, 'exp') if args.data_dir else config.exp_dir
     config.save_dir = config.get('save_dir') or os.path.join(config.exp_dir, config.trial_name, 'save')
     config.ckpt_dir = config.get('ckpt_dir') or os.path.join(config.exp_dir, config.trial_name, 'ckpt')
     config.code_dir = config.get('code_dir') or os.path.join(config.exp_dir, config.trial_name, 'code')
     config.config_dir = config.get('config_dir') or os.path.join(config.exp_dir, config.trial_name, 'config')
-
-
-    if args.data_dir:
-        config.dataset.root_dir = args.data_dir or config.dataset.root_dir
-        config.exp_dir = os.path.join(args.data_dir, 'exp')
-        config.runs_dir = os.path.join(args.data_dir, 'runs')
+    config.runs_dir = os.path.join(args.data_dir, 'runs') if args.data_dir else args.runs_dir
 
     logger = logging.getLogger('pytorch_lightning')
     if args.verbose:
@@ -92,7 +89,7 @@ def main():
     loggers = []
     if args.train:
         loggers += [
-            TensorBoardLogger(args.runs_dir, name=config.name, version=config.trial_name),
+            TensorBoardLogger(config.runs_dir, name=config.name, version=config.trial_name),
             CSVLogger(config.exp_dir, name=config.trial_name, version='csv_logs')
         ]
     
